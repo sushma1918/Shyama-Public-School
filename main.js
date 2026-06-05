@@ -10,10 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   const header = document.querySelector('header');
   const mobileToggle = document.querySelector('.mobile-menu-toggle');
-  const navMenu = document.querySelector('.nav-menu-left');
+  const navMenu = document.querySelector('header .nav-container > .nav-menu-left');
   
   // Toggle Header background on scroll
   window.addEventListener('scroll', () => {
+    if (!header) {
+      return;
+    }
+
     if (window.scrollY > 50) {
       header.classList.add('scrolled');
     } else {
@@ -23,18 +27,35 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Mobile Menu Hamburger Toggle
   if (mobileToggle && navMenu) {
+    if (!navMenu.id) {
+      navMenu.id = 'primary-navigation';
+    }
+
+    mobileToggle.setAttribute('aria-controls', navMenu.id);
+    mobileToggle.setAttribute('aria-expanded', 'false');
+
+    const closeMobileMenu = () => {
+      mobileToggle.classList.remove('open');
+      navMenu.classList.remove('mobile-open');
+      mobileToggle.setAttribute('aria-expanded', 'false');
+    };
+
     mobileToggle.addEventListener('click', () => {
-      mobileToggle.classList.toggle('open');
-      navMenu.classList.toggle('mobile-open');
+      const isOpen = mobileToggle.classList.toggle('open');
+      navMenu.classList.toggle('mobile-open', isOpen);
+      mobileToggle.setAttribute('aria-expanded', String(isOpen));
     });
     
     // Close menu when clicking links
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        mobileToggle.classList.remove('open');
-        navMenu.classList.remove('mobile-open');
-      });
+      link.addEventListener('click', closeMobileMenu);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeMobileMenu();
+      }
     });
   }
 
@@ -146,50 +167,84 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   // 4. Client-side Form Validation & Modals
   // ==========================================
-  const form = document.querySelector('.interactive-form');
+  const forms = document.querySelectorAll('.interactive-form');
   const successModal = document.getElementById('successModal');
   const modalClose = document.getElementById('modalCloseBtn');
   
-  if (form && successModal) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      // Perform validation checks
-      let isValid = true;
-      const inputs = form.querySelectorAll('[required]');
-      
-      inputs.forEach(input => {
-        if (!input.value.trim()) {
-          isValid = false;
-          input.style.borderColor = 'red';
-        } else {
-          input.style.borderColor = '';
+  if (forms.length > 0 && successModal) {
+    const schoolEmail = 'shyamapublicschool1998@gmail.com';
+
+    const getFieldLabel = (field) => {
+      if (field.id) {
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) {
+          return label.textContent.replace('*', '').trim();
         }
-        
-        // Email validation check
-        if (input.type === 'email' && input.value) {
-          const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailPattern.test(input.value)) {
+      }
+
+      return field.name || field.id || 'Field';
+    };
+
+    forms.forEach(form => {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Perform validation checks
+        let isValid = true;
+        const inputs = form.querySelectorAll('[required]');
+
+        inputs.forEach(input => {
+          if (!input.value.trim()) {
             isValid = false;
             input.style.borderColor = 'red';
+            input.setAttribute('aria-invalid', 'true');
+          } else {
+            input.style.borderColor = '';
+            input.removeAttribute('aria-invalid');
           }
-        }
-        
-        // Mobile number validation (10 digits check)
-        if (input.type === 'tel' && input.value) {
-          const phonePattern = /^\d{10}$/;
-          if (!phonePattern.test(input.value.replace(/[^0-9]/g, ''))) {
-            isValid = false;
-            input.style.borderColor = 'red';
+
+          // Email validation check
+          if (input.type === 'email' && input.value) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(input.value)) {
+              isValid = false;
+              input.style.borderColor = 'red';
+              input.setAttribute('aria-invalid', 'true');
+            }
           }
+
+          // Mobile number validation (10 digits check)
+          if (input.type === 'tel' && input.value) {
+            const phonePattern = /^\d{10}$/;
+            if (!phonePattern.test(input.value.replace(/[^0-9]/g, ''))) {
+              isValid = false;
+              input.style.borderColor = 'red';
+              input.setAttribute('aria-invalid', 'true');
+            }
+          }
+        });
+
+        if (isValid) {
+          const formType = form.dataset.formType || 'Website Inquiry';
+          const fields = Array.from(form.querySelectorAll('input, select, textarea'));
+          const messageLines = fields
+            .filter(field => field.value.trim())
+            .map(field => `${getFieldLabel(field)}: ${field.value.trim()}`);
+          const body = [
+            `Hello Shyama Public School,`,
+            '',
+            `Please review this ${formType.toLowerCase()} submitted from the website:`,
+            '',
+            ...messageLines
+          ].join('\n');
+          const mailtoUrl = `mailto:${schoolEmail}?subject=${encodeURIComponent(formType)}&body=${encodeURIComponent(body)}`;
+
+          window.location.href = mailtoUrl;
+
+          successModal.style.display = 'flex';
+          form.reset();
         }
       });
-      
-      if (isValid) {
-        // Show success modal dialog
-        successModal.style.display = 'flex';
-        form.reset();
-      }
     });
     
     // Close success modal
@@ -207,7 +262,44 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 5. Highlights Slider/Carousel Logic
+  // 5. Premium UI Micro Interactions
+  // ==========================================
+  const interactiveCards = document.querySelectorAll(
+    '.feature-card, .facility-card, .testimonial-card, .academics-box-card, .timeline-card, .contact-info-card, .stat-card, .asym-card'
+  );
+
+  interactiveCards.forEach(card => {
+    card.classList.add('interactive-card');
+    card.setAttribute('tabindex', '0');
+
+    const expandCard = () => {
+      interactiveCards.forEach(item => {
+        if (item !== card) {
+          item.classList.remove('is-expanded');
+        }
+      });
+      card.classList.toggle('is-expanded');
+    };
+
+    card.addEventListener('click', expandCard);
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        expandCard();
+      }
+    });
+  });
+
+  const pressableControls = document.querySelectorAll('.btn, .btn-slanted-pill, .filter-btn, .carousel-control');
+  pressableControls.forEach(control => {
+    control.addEventListener('pointerdown', () => control.classList.add('is-pressed'));
+    ['pointerup', 'pointerleave', 'blur'].forEach(eventName => {
+      control.addEventListener(eventName, () => control.classList.remove('is-pressed'));
+    });
+  });
+
+  // ==========================================
+  // 6. Highlights Slider/Carousel Logic
   // ==========================================
   const slider = document.getElementById('announcementsSlider');
   const slides = document.querySelectorAll('.carousel-slide');
@@ -290,4 +382,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
-
