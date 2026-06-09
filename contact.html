@@ -11,27 +11,28 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Styled SVG map mockup animations */
-    .map-mockup svg {
+    .google-map-frame {
       width: 100%;
-      height: 100%;
-      background-color: #f1ebd9; /* warm ground color mockup */
+      height: 350px;
+      border: 0;
+      display: block;
+      border-radius: 22px;
     }
-    .map-pin {
-      animation: bouncePin 2s infinite alternate;
-      cursor: pointer;
+    .map-action-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 14px;
     }
-    @keyframes bouncePin {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-8px); }
-    }
-    .map-tooltip {
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-    .map-mockup:hover .map-tooltip {
-      opacity: 1;
+    @media (max-width: 580px) {
+      .google-map-frame {
+        height: 300px;
+      }
+      .map-action-row {
+        justify-content: stretch;
+      }
+      .map-action-row .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -135,45 +136,19 @@
             </div>
           </div>
           
-          <!-- Interactive Mock Google Map SVG -->
+          <!-- Google Map -->
           <div class="map-mockup">
-            <svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg">
-              <rect x="0" y="0" width="800" height="350" fill="#f5eedc"/>
-              <path d="M-50,290 C150,280 300,320 500,290 C700,260 850,290 900,280 L900,380 L-50,380 Z" fill="#93c5fd" opacity="0.5"/>
-              
-              <!-- Roads -->
-              <line x1="0" y1="120" x2="800" y2="120" stroke="#ffffff" stroke-width="8"/>
-              <line x1="0" y1="120" x2="800" y2="120" stroke="#ebdcd5" stroke-width="3"/>
-              
-              <line x1="150" y1="0" x2="150" y2="350" stroke="#ffffff" stroke-width="6"/>
-              <line x1="150" y1="0" x2="150" y2="350" stroke="#ebdcd5" stroke-width="2"/>
-
-              <line x1="450" y1="0" x2="450" y2="350" stroke="#ffffff" stroke-width="8"/>
-              <line x1="450" y1="0" x2="450" y2="350" stroke="#d4af37" stroke-width="4"/> 
-              
-              <line x1="450" y1="180" x2="800" y2="180" stroke="#ffffff" stroke-width="6"/>
-              <line x1="450" y1="180" x2="800" y2="180" stroke="#ebdcd5" stroke-width="2"/>
-
-              <!-- Landmarks -->
-              <rect x="340" y="60" width="90" height="40" rx="4" fill="#ebdcd5" stroke="#807070" stroke-width="1"/>
-              <text x="385" y="85" font-family="'Inter', sans-serif" font-size="10" font-weight="600" fill="#4a3e3e" text-anchor="middle">Power House</text>
-
-              <rect x="520" y="210" width="100" height="45" rx="6" fill="#fee2e2" stroke="#8c0e2a" stroke-width="2"/>
-              <text x="570" y="236" font-family="'Inter', sans-serif" font-size="9" font-weight="700" fill="#8c0e2a" text-anchor="middle">Shyama School</text>
-
-              <!-- Main Pin -->
-              <g class="map-pin" transform="translate(570, 205)">
-                <path d="M0,0 C-10,-10 -15,-20 -15,-30 C-15,-40 -7,-45 0,-45 C7,-45 15,-40 15,-30 C15,-20 10,-10 0,0 Z" fill="#8c0e2a"/>
-                <circle cx="0" cy="-30" r="6" fill="#ffffff"/>
-              </g>
-
-              <!-- Hover Tooltip box -->
-              <g class="map-tooltip" transform="translate(500, 105)">
-                <rect x="0" y="0" width="150" height="45" rx="6" fill="#1a1515" opacity="0.95"/>
-                <text x="75" y="18" font-family="'Inter', sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle">SHYAMA PUBLIC SCHOOL</text>
-                <text x="75" y="32" font-family="'Inter', sans-serif" font-size="8" fill="#807070" text-anchor="middle">Gyanpur, Bhadohi, U.P.</text>
-              </g>
-            </svg>
+            <iframe
+              class="google-map-frame"
+              title="Shyama Public School location on Google Maps"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://maps.google.com/maps?q=Behind%20Power%20House%2C%20Gyanpur%2C%20Bhadohi%2C%20U.P.%20Pin%20-%20221304&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+            <div class="map-action-row">
+              <a class="btn btn-primary" href="https://www.google.com/maps/search/Behind+Power+House,+Gyanpur,+Bhadohi,+U.P.+Pin+-+221304/@25.333432,82.510755,96061m/data=!3m1!1e3?hl=en-IN&entry=ttu&g_ep=EgoyMDI2MDYwMy4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">
+                Open in Google Maps <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+            </div>
           </div>
         </div>
 
