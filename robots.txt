@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://comforting-chimera-cd1095.netlify.app/sitemap.xml
